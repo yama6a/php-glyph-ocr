@@ -1,0 +1,49 @@
+{
+  "name": "ymakhloufi/php-glyph-ocr",
+  "description": "Pure PHP OCR for clean rendered text bitmaps such as image subtitles. A port of the nOCR engine from Subtitle Edit.",
+  "keywords": [
+    "ocr",
+    "glyph",
+    "bitmap",
+    "text recognition",
+    "subtitle edit",
+    "png"
+  ],
+  "homepage": "https://github.com/yama6a/php-glyph-ocr",
+  "license": "MIT",
+  "support": {
+    "issues": "https://github.com/yama6a/php-glyph-ocr/issues",
+    "source": "https://github.com/yama6a/php-glyph-ocr"
+  },
+  "autoload": {
+    "psr-4": {
+      "GlyphOcr\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "GlyphOcr\\Tests\\Fixtures\\Generator\\": "tests/fixtures/generator/",
+      "GlyphOcr\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": "^8.2",
+    "ext-zlib": "*"
+  },
+  "require-dev": {
+    "ext-mbstring": "*",
+    "phpunit/phpunit": "^11.5"
+  },
+  "suggest": {
+    "ext-gd": "Needed only for Image::fromGd()"
+  },
+  "config": {
+    "platform": {
+      "php": "8.2.0"
+    },
+    "sort-packages": true
+  },
+  "scripts": {
+    "test": "phpunit"
+  }
+}

@@ -1,0 +1,8 @@
+/.github         export-ignore
+/tests           export-ignore
+/.gitattributes  export-ignore
+/.gitignore      export-ignore
+/phpunit.xml     export-ignore
+/renovate.json5  export-ignore
+/resources/*.nocr -text
+/tests/fixtures/** -text
