@@ -5,4 +5,7 @@
 
   // ci.yaml fails a PR without a release label. A dependency bump never changes the public API.
   labels: ["patch"],
+
+  // The harness that wrote tests/fixtures/subtitle-edit/expected.txt keeps the SkiaSharp version it ran with.
+  ignorePaths: ["tests/fixtures/subtitle-edit/**"],
 }

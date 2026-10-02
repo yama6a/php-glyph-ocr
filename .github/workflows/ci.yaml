@@ -16,6 +16,11 @@ permissions:
   contents: read
 
 jobs:
+  php:
+    uses: yama6a/gha/.github/workflows/php-ci.yaml@v2
+    with:
+      extensions: gd
+
   release-label:
     name: release label
     # a push to main carries no PR labels, so the check runs on the PR only
