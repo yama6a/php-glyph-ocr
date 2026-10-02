@@ -1,5 +1,5 @@
 {
-  "name": "ymakhloufi/php-glyph-ocr",
+  "name": "yama6a/php-glyph-ocr",
   "description": "Pure PHP OCR for clean rendered text bitmaps such as image subtitles. A port of the nOCR engine from Subtitle Edit.",
   "keywords": [
     "ocr",

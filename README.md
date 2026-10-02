@@ -7,7 +7,7 @@ The engine cuts an image into lines and glyphs and compares each glyph with a da
 Needs PHP 8.2 or later with ext-zlib. ext-gd is optional and only needed for `Image::fromGd()`.
 
 ```sh
-composer require ymakhloufi/php-glyph-ocr
+composer require yama6a/php-glyph-ocr
 ```
 
 ## Usage
