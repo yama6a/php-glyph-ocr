@@ -1,0 +1,8 @@
+{
+  // The schedule is the cron in .github/workflows/renovate.yaml, so workflow_dispatch works too.
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["github>yama6a/gha:default.json5", "github>yama6a/gha:php.json5"],
+
+  // ci.yaml fails a PR without a release label. A dependency bump never changes the public API.
+  labels: ["patch"],
+}

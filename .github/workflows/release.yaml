@@ -1,0 +1,17 @@
+# Tags a release on every merge to main. Packagist reads the tag through its GitHub webhook.
+name: release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create the tag and the GitHub release
+
+jobs:
+  release:
+    uses: yama6a/gha/.github/workflows/php-release.yaml@v2
