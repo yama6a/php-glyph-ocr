@@ -41,7 +41,7 @@ $result->lines[0]->chars[0];        // RecognizedChar: text, confidence, italic,
 | `italicSlant` | `0.0` | Above 0, a glyph that matches nothing is slanted back by this factor and tried again |
 | `rightToLeft` | `false` | Puts the glyphs of each line in right to left order |
 | `minLineHeight` | `12` | Minimum line height in pixels until the recognizer has learned the glyph heights |
-| `lineContext` | `true` | Compares each glyph with the other glyphs of its line to pick I or l, o or O, and comma or apostrophe. `false` keeps the database text, as Subtitle Edit does |
+| `lineContext` | `true` | Compares each glyph with the other glyphs of its line to pick I or l, o, O or 0, and comma or apostrophe. `false` keeps the database text, as Subtitle Edit does |
 
 ## Databases and training
 `GlyphDatabase` reads and writes the `.nocr` files of Subtitle Edit, version 1 and 2. The package ships the Latin database of Subtitle Edit, 699 glyphs in 477 KB. Other scripts and other fonts need their own database.
@@ -70,19 +70,19 @@ The golden images in `tests/fixtures` are white or yellow subtitles, 20 to 60 pi
 |:--- |:--- | ---:| ---:| ---:| ---:|
 | Blu-ray, smooth RGBA | DejaVu Sans, Liberation Sans | 93.8% | 3 of 11 | 99.2% | 10 of 11 |
 | PGS palette | DejaVu Sans, Liberation Sans | 93.0% | 3 of 8 | 100% | 8 of 8 |
-| DVD, 4 colours, 24 to 30 px | DejaVu Sans, Liberation Sans | 62.6% | 0 of 8 | 92.9% | 4 of 8 |
-| Italic | DejaVu Sans, Liberation Sans | 88.1% | 1 of 5 | 97.0% | 2 of 5 |
-| No outline | DejaVu Sans, Liberation Sans | 78.7% | 1 of 5 | 95.5% | 2 of 5 |
+| DVD, 4 colours, 24 to 30 px | DejaVu Sans, Liberation Sans | 63.2% | 0 of 8 | 94.2% | 4 of 8 |
+| Italic | DejaVu Sans, Liberation Sans | 92.1% | 1 of 5 | 97.0% | 2 of 5 |
+| No outline | DejaVu Sans, Liberation Sans | 79.8% | 1 of 5 | 96.6% | 3 of 5 |
 | Small, 20 to 24 px | DejaVu Sans, Liberation Sans | 50.0% | 0 of 4 | 92.3% | 1 of 4 |
 | Capital I and lower case l | DejaVu Sans, Liberation Sans, Noto Sans, Open Sans | 90.2% | 3 of 17 | 97.9% | 10 of 17 |
 | Unseen font | Open Sans | 84.9% | 0 of 8 | 96.7% | 4 of 8 |
-| All | | 84.5% | 11 of 66 | 97.1% | 41 of 66 |
+| All | | 85.0% | 11 of 66 | 97.4% | 42 of 66 |
 
 - Character accuracy is 1 minus the edit distance divided by the length of the expected text.
 - The Latin database has no glyphs of these fonts. The numbers show how it does on fonts it has not seen.
 - "After training" adds one trained glyph per character for each font, size and style: the alphabet, digits and `.,!?'-:`, drawn on a separate image. A new recognizer reads each image.
 - With `lineContext: false`, the Latin database reads 80.3% of the characters. Then 37 of the 269 capital I and lower case l in the golden texts come out as the other letter. With `lineContext: true`, none do.
-- With `italicSlant: 0.2`, the italic set reads 92.1% of the characters.
+- With `italicSlant: 0.2`, the italic set reads 96.0% of the characters.
 - With the same database and `lineContext: false`, the port reads every golden image exactly as Subtitle Edit does. `SubtitleEditParityTest` checks this.
 
 ## Speed

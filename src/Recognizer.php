@@ -40,8 +40,8 @@ final class Recognizer
      * @param bool $rightToLeft puts the glyphs of each line in right to left order
      * @param int $minLineHeight the minimum line height in pixels until the recognizer has learned the glyph heights
      * @param bool $lineContext compares each glyph with the other glyphs of its line to pick capital I or lower
-     *                          case l, upper or lower case for letters such as o and O, and comma or apostrophe;
-     *                          false keeps the database text, as Subtitle Edit does
+     *                          case l, upper or lower case for letters such as o and O, o or zero, and comma or
+     *                          apostrophe; false keeps the database text, as Subtitle Edit does
      */
     public function __construct(
         private readonly GlyphDatabase $database,

@@ -86,6 +86,14 @@ class LineContextTest extends TestCase
     }
 
 
+    public function testAZeroAsShortAsTheXHeightIsO(): void
+    {
+        $line = self::line('n:9:21', '0:9:22', ' ', '1:0:30', '0:0:31');
+
+        $this->assertSame('no 10', self::text(LineCaseFixer::fixLine($line)));
+    }
+
+
     public function testKeepsTheCaseWithoutReferenceLetters(): void
     {
         $line = self::line('O:9:22', 'o:0:31');

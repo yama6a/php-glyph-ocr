@@ -20,10 +20,10 @@ class GoldenTest extends TestCase
     private const MIN_CHARACTER_ACCURACY = [
         'bluray'    => 0.92,
         'capital-i' => 0.88,
-        'dvd'       => 0.61,
-        'italic'    => 0.86,
+        'dvd'       => 0.62,
+        'italic'    => 0.90,
         'pgs'       => 0.91,
-        'plain'     => 0.77,
+        'plain'     => 0.78,
         'small'     => 0.48,
         'unseen'    => 0.83,
     ];

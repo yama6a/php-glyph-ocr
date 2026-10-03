@@ -6,7 +6,7 @@ use GlyphOcr\RecognizedChar;
 
 /**
  * LineCaseFixer picks upper or lower case for letters whose two cases have the same shape, such as o and O,
- * from the capitals and x-height letters on the same line. CaseFixer decides from the heights of all images
+ * from the capitals and x-height letters on the same line. A zero as short as the x-height letters becomes o. CaseFixer decides from the heights of all images
  * seen so far, which fails when the font size changes. This fixer overrides it when the line has a reference.
  *
  * @internal
@@ -54,6 +54,12 @@ final class LineCaseFixer
         }
 
         foreach ($chars as $index => $char) {
+            if ($char->text === '0' && $char->sample !== null && $xHeight !== null &&
+                $char->sample->height < $xHeight * self::SPLIT_RATIO) {
+                $chars[$index] = new RecognizedChar('o', $char->confidence, $char->italic, false, $char->glyph,
+                                                    $char->sample);
+                continue;
+            }
             $upperIndex = array_search($char->text, self::UPPER, true);
             $lowerIndex = array_search($char->text, self::LOWER, true);
             if (($upperIndex === false && $lowerIndex === false) || $char->sample === null) {
