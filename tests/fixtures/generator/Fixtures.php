@@ -15,6 +15,10 @@ final class Fixtures
     private const DEJAVU_OBLIQUE = 'DejaVuSans-Oblique.ttf';
     private const LIBERATION = 'LiberationSans-Regular.ttf';
     private const LIBERATION_ITALIC = 'LiberationSans-Italic.ttf';
+    private const NOTO = 'NotoSans-Regular.ttf';
+    private const NOTO_ITALIC = 'NotoSans-Italic.ttf';
+    private const OPEN_SANS = 'OpenSans-Regular.ttf';
+    private const OPEN_SANS_ITALIC = 'OpenSans-Italic.ttf';
 
 
     /**
@@ -101,7 +105,61 @@ final class Fixtures
             $fixtures["small/$id"] = self::spec($lines, $font, $size, self::WHITE, 1.5, true, 'rgba', 4);
         }
 
+        // Capital I and lower case l in one line, in each style. Most sans-serif fonts draw both as one bar.
+        $capitalI = [
+            ['01', ["I'll tell Lily I'm ill.", 'Is it illegal?'], self::LIBERATION, 44, 'bluray'],
+            ['02', ["If I fall, I'll call you.", 'Lisa will help.'], self::DEJAVU, 40, 'bluray'],
+            ['03', ['IT IS ALL I HAVE.'], self::LIBERATION, 48, 'pgs'],
+            ['04', ["Il est là. Ils l'aiment."], self::DEJAVU, 52, 'pgs'],
+            ['05', ['I hope Isla likes it.', 'I lied.'], self::LIBERATION, 28, 'dvd'],
+            ['06', ['Lily, I told you.'], self::DEJAVU, 26, 'dvd'],
+            ['07', ["I think I lost Lucy's ball."], self::NOTO, 44, 'bluray'],
+            ['08', ['Is Ian in Lisbon?'], self::NOTO, 28, 'dvd'],
+            ['09', ['I really liked it.'], self::LIBERATION_ITALIC, 44, 'bluray'],
+            ['10', ['Alice is all I need.'], self::DEJAVU_OBLIQUE, 40, 'bluray'],
+            ['11', ['I will look later.'], self::NOTO_ITALIC, 44, 'bluray'],
+            ['12', ["I'll call Bill."], self::LIBERATION, 22, 'small'],
+            ['13', ['I like it. Lola does not.'], self::OPEN_SANS, 44, 'bluray'],
+            ['14', ['Is Lille in Belgium?'], self::OPEN_SANS, 28, 'dvd'],
+        ];
+        foreach ($capitalI as [$id, $lines, $font, $size, $style]) {
+            $fixtures["capital-i/$id"] = self::styled($style, $lines, $font, $size);
+        }
+
+        // Open Sans, a font that no bundled database has glyphs of.
+        $unseen = [
+            ['01', ["I don't believe it.", "Let's go home."], self::OPEN_SANS, 44, 'bluray'],
+            ['02', ['Where is the hospital?'], self::OPEN_SANS, 48, 'pgs'],
+            ['03', ['Call me when you land.', 'I will wait.'], self::OPEN_SANS, 28, 'dvd'],
+            ['04', ['It was a long night.'], self::OPEN_SANS_ITALIC, 44, 'bluray'],
+            ['05', ['Bring the keys, please.'], self::OPEN_SANS, 36, 'plain'],
+            ['06', ['Is everyone ready?'], self::OPEN_SANS, 24, 'small'],
+        ];
+        foreach ($unseen as [$id, $lines, $font, $size, $style]) {
+            $fixtures["unseen/$id"] = self::styled($style, $lines, $font, $size);
+        }
+
         return $fixtures;
+    }
+
+
+    /**
+     * Draws the lines as the set of the same name above draws them.
+     *
+     * @param list<string> $lines
+     * @return array{lines: list<string>, font: string, size: float, fill: array{int, int, int},
+     *     outline: array{int, int, int}, outlineWidth: float, antiAlias: bool, output: string, padding: int,
+     *     canvasWidth: int|null}
+     */
+    private static function styled(string $style, array $lines, string $font, float $size): array
+    {
+        return match ($style) {
+            'bluray' => self::spec($lines, $font, $size, self::WHITE, $size / 14, true, 'rgba', 6),
+            'pgs'    => self::spec($lines, $font, $size, self::WHITE, $size / 16, true, 'pgs', 2),
+            'dvd'    => self::spec($lines, $font, $size, self::WHITE, 2.0, true, 'dvd', 4, 720),
+            'plain'  => self::spec($lines, $font, $size, self::WHITE, 0.0, true, 'rgba', 4),
+            'small'  => self::spec($lines, $font, $size, self::WHITE, 1.5, true, 'rgba', 4),
+        };
     }
 
 

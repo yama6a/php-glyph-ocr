@@ -18,12 +18,14 @@ class GoldenTest extends TestCase
      * Subtitle Edit has no glyphs of these fonts, so the numbers show how it does on fonts it has not seen.
      */
     private const MIN_CHARACTER_ACCURACY = [
-        'bluray' => 0.88,
-        'dvd'    => 0.60,
-        'italic' => 0.80,
-        'pgs'    => 0.88,
-        'plain'  => 0.75,
-        'small'  => 0.44,
+        'bluray'    => 0.88,
+        'capital-i' => 0.80,
+        'dvd'       => 0.60,
+        'italic'    => 0.80,
+        'pgs'       => 0.88,
+        'plain'     => 0.75,
+        'small'     => 0.44,
+        'unseen'    => 0.80,
     ];
 
 

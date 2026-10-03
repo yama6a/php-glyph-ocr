@@ -6,6 +6,20 @@ bluray/05.png | Thank you, Mr. Jensen. / Good night. /
 bluray/06.png | Nobody S* anything, right? /
 bluray/07.png | The traiD leaves a* 7:45. / Do Do* be la*e. /
 bluray/08.png | Wha* happened *o *he money? /
+capital-i/01.png | *'ll tell Lily *'m ill. / *s it illegal? /
+capital-i/02.png | lf l fal** l'll Call you. / LiSa will help. /
+capital-i/03.png | lT ls ALL l HAVE. /
+capital-i/04.png | ll eS* là. lls l'aiment. /
+capital-i/05.png | l*opel*lalikesit. / llied. /
+capital-i/06.png | Lily' l*oldyou.
+capital-i/07.png | I thiDk I loSt Lucy's ball* /
+capital-i/08.png | I*IaDiDLi*boD? /
+capital-i/09.png | I reaIIyIikedit* /
+capital-i/10.png | AIiCe iS aII I need. /
+capital-i/11.png | IwiI!IookIat8r. /
+capital-i/12.png | l*ll**ll*ill' /
+capital-i/13.png | l l*ke i** Lola does no** /
+capital-i/14.png | lsL*lleiDBel*ium? / !
 dvd/01.png | comeo*'*u*ryup!
 dvd/02.png | w*ydidyoudot**t? / You**omi*ed*e'
 dvd/03.png | Tu**l*********idg*'
@@ -29,3 +43,9 @@ plain/04.png | si* *pple* aDd DiDe pe**s. / !
 small/01.png | s*****'****.
 small/02.png | C*ll**e**liCe* / Now* /
 small/03.png | l***i*y*u***g?
+unseen/01.png | l don't bel*eve it* / Let's go home* /
+unseen/02.png | Where *S the hosp*tal? /
+unseen/03.png | CallmeW*eDyoula*d' / lwillwai** /
+unseen/04.png | ItWaS a Ion*ni*ht* /
+unseen/05.png | Br*D*the keys* plea*e. / !
+unseen/06.png | l*everyo*e*eady*
