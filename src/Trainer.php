@@ -17,6 +17,9 @@ final class Trainer
 {
     private const GIVE_UP_COUNT = 15_000;
 
+    /** Angles closer than this count as equal, so the result does not depend on the last bit of atan2(). */
+    private const ANGLE_EPSILON = 1e-9;
+
     private Randomizer $random;
 
 
@@ -237,12 +240,11 @@ final class Trainer
         $midY = [];
         $lengths = [];
         foreach ($lines as $i => [$x1, $y1, $x2, $y2]) {
-            $angle = atan2($y2 - $y1, $x2 - $x1);
+            // A line and its reverse get the same angle on every platform only when atan2() sees the same input.
+            $reverse = $x2 < $x1 || ($x2 === $x1 && $y2 < $y1);
+            $angle = $reverse ? atan2($y1 - $y2, $x1 - $x2) : atan2($y2 - $y1, $x2 - $x1);
             if ($angle < 0) {
                 $angle += M_PI;
-            }
-            if ($angle >= M_PI) {
-                $angle -= M_PI;
             }
             $angles[$i] = $angle;
             $midX[$i] = ($x1 + $x2) / 2.0;
@@ -276,7 +278,8 @@ final class Trainer
                 if (abs($lengths[$i] - $lengths[$j]) <= $maxLength * 0.25) {
                     $axisI = self::distanceToAxis($angles[$i]);
                     $axisJ = self::distanceToAxis($angles[$j]);
-                    $dropJ = $axisI !== $axisJ ? $axisI <= $axisJ : $lengths[$j] <= $lengths[$i];
+                    $dropJ = abs($axisI - $axisJ) > self::ANGLE_EPSILON ? $axisI <= $axisJ
+                        : $lengths[$j] <= $lengths[$i];
                 } else {
                     $dropJ = $lengths[$j] <= $lengths[$i];
                 }
