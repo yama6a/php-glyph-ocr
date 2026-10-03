@@ -136,4 +136,14 @@ class RecognizerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         new Recognizer(new GlyphDatabase(), spaceWidth: 0);
     }
+
+
+    public function testLineContextPicksCapitalIOrLowerCaseL(): void
+    {
+        $image = self::fixture('capital-i/03');
+
+        $this->assertSame('IT IS ALL I HAVE.', (new Recognizer(GlyphDatabase::latin()))->recognize($image)->text());
+        $this->assertSame('lT ls ALL l HAVE.', (new Recognizer(GlyphDatabase::latin(), lineContext: false))
+            ->recognize($image)->text());
+    }
 }

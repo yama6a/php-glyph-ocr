@@ -4,8 +4,11 @@ namespace GlyphOcr;
 
 use GlyphOcr\Exceptions\InvalidArgumentException;
 use GlyphOcr\Internal\Bitmap;
+use GlyphOcr\Internal\CapitalIFixer;
 use GlyphOcr\Internal\CaseFixer;
+use GlyphOcr\Internal\LineCaseFixer;
 use GlyphOcr\Internal\LineHeightTracker;
+use GlyphOcr\Internal\MarkFixer;
 use GlyphOcr\Internal\Matcher;
 use GlyphOcr\Internal\SplitItem;
 use GlyphOcr\Internal\Splitter;
@@ -21,6 +24,7 @@ final class Recognizer
     private Matcher $matcher;
     private LineHeightTracker $lineHeights;
     private CaseFixer $caseFixer;
+    private CapitalIFixer $capitalIFixer;
 
 
     /**
@@ -34,6 +38,10 @@ final class Recognizer
      * @param float $italicSlant when above 0, a glyph that matches nothing is slanted back by this factor and
      *                           tried again; 0.2 fits most italic fonts
      * @param bool $rightToLeft puts the glyphs of each line in right to left order
+     * @param int $minLineHeight the minimum line height in pixels until the recognizer has learned the glyph heights
+     * @param bool $lineContext compares each glyph with the other glyphs of its line to pick capital I or lower
+     *                          case l, upper or lower case for letters such as o and O, and comma or apostrophe;
+     *                          false keeps the database text, as Subtitle Edit does
      */
     public function __construct(
         private readonly GlyphDatabase $database,
@@ -45,6 +53,7 @@ final class Recognizer
         private readonly float $italicSlant = 0.0,
         private readonly bool $rightToLeft = false,
         private readonly int $minLineHeight = 12,
+        private readonly bool $lineContext = true,
     ) {
         if ($inkThreshold < 1 || $inkThreshold > 765) {
             throw new InvalidArgumentException("Cannot create a recognizer with ink threshold $inkThreshold - " .
@@ -71,6 +80,7 @@ final class Recognizer
     {
         $this->lineHeights = new LineHeightTracker($this->minLineHeight);
         $this->caseFixer = new CaseFixer();
+        $this->capitalIFixer = new CapitalIFixer();
     }
 
 
@@ -86,7 +96,7 @@ final class Recognizer
             if ($item->bitmap === null) {
                 if ($item->special === Splitter::LINE_BREAK) {
                     if (count($chars) > 0) {
-                        $lines[] = new RecognizedLine($chars);
+                        $lines[] = $this->line($chars);
                     }
                     $chars = [];
                 } else {
@@ -111,10 +121,23 @@ final class Recognizer
             $i += $parts - 1;
         }
         if (count($chars) > 0) {
-            $lines[] = new RecognizedLine($chars);
+            $lines[] = $this->line($chars);
         }
 
         return new RecognitionResult($lines);
+    }
+
+
+    /**
+     * @param list<RecognizedChar> $chars
+     */
+    private function line(array $chars): RecognizedLine
+    {
+        if ($this->lineContext) {
+            $chars = $this->capitalIFixer->fixLine(LineCaseFixer::fixLine(MarkFixer::fixLine($chars)));
+        }
+
+        return new RecognizedLine($chars);
     }
 
 
