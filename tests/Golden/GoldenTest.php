@@ -9,34 +9,49 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Reads every golden image with the shipped Latin database and checks the character accuracy of each set.
+ * Reads every golden image with each shipped database and checks the character accuracy of each set.
  */
 class GoldenTest extends TestCase
 {
     /**
-     * Minimum character accuracy per set, about 1.5 points under the measured value. The Latin database of
-     * Subtitle Edit has no glyphs of these fonts, so the numbers show how it does on fonts it has not seen.
+     * Minimum character accuracy per database and set, about 1.5 points under the measured value. The Latin
+     * database of Subtitle Edit has no glyphs of these fonts, so its numbers show how it does on fonts it has
+     * not seen. The subtitle fonts database has no glyphs of Open Sans, the font of the unseen set.
      */
     private const MIN_CHARACTER_ACCURACY = [
-        'bluray'    => 0.92,
-        'capital-i' => 0.88,
-        'dvd'       => 0.62,
-        'italic'    => 0.90,
-        'pgs'       => 0.91,
-        'plain'     => 0.78,
-        'small'     => 0.48,
-        'unseen'    => 0.83,
+        'latin'         => [
+            'bluray'    => 0.92,
+            'capital-i' => 0.88,
+            'dvd'       => 0.62,
+            'italic'    => 0.90,
+            'pgs'       => 0.91,
+            'plain'     => 0.78,
+            'small'     => 0.48,
+            'unseen'    => 0.83,
+        ],
+        'subtitleFonts' => [
+            'bluray'    => 0.97,
+            'capital-i' => 0.97,
+            'dvd'       => 0.94,
+            'italic'    => 0.96,
+            'pgs'       => 0.98,
+            'plain'     => 0.97,
+            'small'     => 0.96,
+            'unseen'    => 0.95,
+        ],
     ];
 
 
     /**
-     * @return array<string, array{string}>
+     * @return array<string, array{string, string}>
      */
     public static function sets(): array
     {
         $sets = [];
-        foreach (array_keys(self::MIN_CHARACTER_ACCURACY) as $set) {
-            $sets[$set] = [$set];
+        foreach (self::MIN_CHARACTER_ACCURACY as $database => $minimums) {
+            foreach (array_keys($minimums) as $set) {
+                $sets["$database $set"] = [$database, $set];
+            }
         }
 
         return $sets;
@@ -44,13 +59,13 @@ class GoldenTest extends TestCase
 
 
     #[DataProvider('sets')]
-    public function testCharacterAccuracyOfTheSetReachesItsMinimum(string $set): void
+    public function testCharacterAccuracyOfTheSetReachesItsMinimum(string $database, string $set): void
     {
         $files = glob(dirname(__DIR__) . "/fixtures/$set/*.png");
         $this->assertNotEmpty($files);
 
         // One recognizer per set, as for the images of one subtitle stream.
-        $recognizer = new Recognizer(self::latin());
+        $recognizer = new Recognizer(self::database($database));
         $characters = 0;
         $errors = 0;
         $report = [];
@@ -64,7 +79,7 @@ class GoldenTest extends TestCase
         }
 
         $accuracy = 1 - $errors / $characters;
-        $this->assertGreaterThanOrEqual(self::MIN_CHARACTER_ACCURACY[$set], $accuracy,
+        $this->assertGreaterThanOrEqual(self::MIN_CHARACTER_ACCURACY[$database][$set], $accuracy,
                                         sprintf("%s: %.1f%%\n%s", $set, $accuracy * 100, implode("\n", $report)));
     }
 
@@ -77,11 +92,11 @@ class GoldenTest extends TestCase
     }
 
 
-    private static function latin(): GlyphDatabase
+    private static function database(string $name): GlyphDatabase
     {
-        static $database = null;
+        static $databases = [];
 
-        return $database ??= GlyphDatabase::latin();
+        return $databases[$name] ??= GlyphDatabase::$name();
     }
 
 
