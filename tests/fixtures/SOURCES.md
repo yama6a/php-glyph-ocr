@@ -14,6 +14,8 @@ Each `<set>/<nn>.png` has a `<set>/<nn>.txt` with the exact text, one line per t
 | `italic` | As `bluray`, with the italic font files | DejaVu Sans Oblique, Liberation Sans Italic, 40 to 52 px |
 | `plain` | White text without outline, 2 with smooth edges and 2 without anti-aliasing | DejaVu Sans, Liberation Sans, 30 to 40 px |
 | `small` | As `bluray`, with a 1.5 pixel outline | DejaVu Sans, Liberation Sans, 20 to 24 px |
+| `capital-i` | Lines with capital I and lower case l, in the shapes of the sets above | DejaVu Sans, Liberation Sans, Noto Sans and their italics, Open Sans, 22 to 52 px |
+| `unseen` | General lines in the shapes of the sets above, in a font that no bundled database has glyphs of | Open Sans, Open Sans Italic, 24 to 48 px |
 
 The image sizes and palettes follow the PGS and VobSub fixtures of [subtitle-toolbox](https://github.com/yama6a/subtitle-toolbox/tree/master/tests/files), which hold shapes only.
 
@@ -33,8 +35,10 @@ The rasterizer uses the accumulation method of [font-rs](https://github.com/raph
 |:--- |:--- |:--- |
 | `generator/fonts/DejaVuSans.ttf`, `DejaVuSans-Oblique.ttf` | [DejaVu Fonts 2.37](https://github.com/dejavu-fonts/dejavu-fonts/releases/tag/version_2_37) | Bitstream Vera license with public domain changes, see `DejaVu-LICENSE.txt` |
 | `generator/fonts/LiberationSans-Regular.ttf`, `LiberationSans-Italic.ttf` | [Liberation Fonts 2.1.5](https://github.com/liberationfonts/liberation-fonts/releases/tag/2.1.5) | SIL Open Font License 1.1, see `Liberation-LICENSE.txt` |
+| `generator/fonts/NotoSans-Regular.ttf`, `NotoSans-Italic.ttf` | [Noto Sans 2.015](https://github.com/notofonts/latin-greek-cyrillic/releases/tag/NotoSans-v2.015), the unhinted files | SIL Open Font License 1.1, see `Noto-LICENSE.txt` |
+| `generator/fonts/OpenSans-Regular.ttf`, `OpenSans-Italic.ttf` | [Open Sans](https://github.com/googlefonts/opensans/tree/bd7e37632246368c60fdcbd374dbf9bad11969b6/fonts/ttf) at commit `bd7e376`, the static files | SIL Open Font License 1.1, see `OpenSans-LICENSE.txt` |
 
-Both licenses allow redistribution of the unchanged font files with their license text.
+All licenses allow redistribution of the unchanged font files with their license text.
 
 ## Subtitle Edit output
 
