@@ -51,6 +51,18 @@ final class GlyphDatabase
     }
 
 
+    /**
+     * Loads the glyphs of DejaVu Sans, Liberation Sans and Noto Sans that ship with this package, upright and
+     * italic, followed by the Latin database for other fonts.
+     */
+    public static function subtitleFonts(): self
+    {
+        $fonts = self::fromFile(dirname(__DIR__) . '/resources/SubtitleFonts.nocr');
+
+        return new self([...$fonts->glyphs(), ...self::latin()->glyphs()]);
+    }
+
+
     public static function fromFile(string $path): self
     {
         if (!is_file($path) || !is_readable($path)) {

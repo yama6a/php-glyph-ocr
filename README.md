@@ -16,7 +16,7 @@ use GlyphOcr\GlyphDatabase;
 use GlyphOcr\Image;
 use GlyphOcr\Recognizer;
 
-$recognizer = new Recognizer(GlyphDatabase::latin());
+$recognizer = new Recognizer(GlyphDatabase::subtitleFonts());
 $result = $recognizer->recognize(Image::fromPng(file_get_contents('subtitle.png')));
 
 $result->text();                    // all lines, joined with "\n"
@@ -44,7 +44,18 @@ $result->lines[0]->chars[0];        // RecognizedChar: text, confidence, italic,
 | `lineContext` | `true` | Compares each glyph with the other glyphs of its line to pick I or l, o, O or 0, and comma or apostrophe. `false` keeps the database text, as Subtitle Edit does |
 
 ## Databases and training
-`GlyphDatabase` reads and writes the `.nocr` files of Subtitle Edit, version 1 and 2. The package ships the Latin database of Subtitle Edit, 699 glyphs in 477 KB. Other scripts and other fonts need their own database.
+`GlyphDatabase` reads and writes the `.nocr` files of Subtitle Edit, version 1 and 2. The package ships two databases:
+
+| Method | Glyphs | File size | Load time, PHP 8.5 | Memory |
+|:--- | ---:| ---:| ---:| ---:|
+| `GlyphDatabase::subtitleFonts()` | 2,007 | 254 KB + 477 KB | 90 ms | 76 MB |
+| `GlyphDatabase::latin()` | 699 | 477 KB | 58 ms | 52 MB |
+
+- **`subtitleFonts()`**: glyphs trained on DejaVu Sans, Liberation Sans and Noto Sans, upright and italic, at 28 and 48 px, followed by the Latin database for other fonts. Liberation Sans has the metrics of Arial. Use this database for subtitles.
+- **`latin()`**: the Latin database of Subtitle Edit, unchanged. Use it to get the same result as Subtitle Edit.
+- Other scripts and other fonts need their own database.
+
+`tests/fixtures/generator/train.php` writes `resources/SubtitleFonts.nocr` again. The fonts and their licenses are in `tests/fixtures/generator/fonts`. The database holds line segments measured on rendered glyphs, and no font outlines.
 
 Train a glyph from a sample that a person confirmed. The new glyph goes first, so it wins over older glyphs that match equally well:
 
@@ -66,22 +77,24 @@ $database->save('my-font.nocr');
 ## Accuracy
 The golden images in `tests/fixtures` are white or yellow subtitles, 20 to 60 pixels, 1 or 2 lines. `tests/fixtures/SOURCES.md` describes them. One recognizer reads each set in order.
 
-| Set | Fonts | Latin database: characters | Latin database: lines | After training: characters | After training: lines |
-|:--- |:--- | ---:| ---:| ---:| ---:|
-| Blu-ray, smooth RGBA | DejaVu Sans, Liberation Sans | 93.8% | 3 of 11 | 99.2% | 10 of 11 |
-| PGS palette | DejaVu Sans, Liberation Sans | 93.0% | 3 of 8 | 100% | 8 of 8 |
-| DVD, 4 colours, 24 to 30 px | DejaVu Sans, Liberation Sans | 63.2% | 0 of 8 | 94.2% | 4 of 8 |
-| Italic | DejaVu Sans, Liberation Sans | 92.1% | 1 of 5 | 97.0% | 2 of 5 |
-| No outline | DejaVu Sans, Liberation Sans | 79.8% | 1 of 5 | 96.6% | 3 of 5 |
-| Small, 20 to 24 px | DejaVu Sans, Liberation Sans | 50.0% | 0 of 4 | 92.3% | 1 of 4 |
-| Capital I and lower case l | DejaVu Sans, Liberation Sans, Noto Sans, Open Sans | 90.2% | 3 of 17 | 97.9% | 10 of 17 |
-| Unseen font | Open Sans | 84.9% | 0 of 8 | 96.7% | 4 of 8 |
-| All | | 85.0% | 11 of 66 | 97.4% | 42 of 66 |
+Character accuracy, with the lines read without error in brackets:
+
+| Set | Fonts | `subtitleFonts()` | `latin()` | After training |
+|:--- |:--- | ---:| ---:| ---:|
+| Blu-ray, smooth RGBA | DejaVu Sans, Liberation Sans | 98.8% (9 of 11) | 93.8% (3 of 11) | 99.2% (10 of 11) |
+| PGS palette | DejaVu Sans, Liberation Sans | 100% (8 of 8) | 93.0% (3 of 8) | 100% (8 of 8) |
+| DVD, 4 colours, 24 to 30 px | DejaVu Sans, Liberation Sans | 95.5% (4 of 8) | 63.2% (0 of 8) | 94.2% (4 of 8) |
+| Italic | DejaVu Sans, Liberation Sans | 98.0% (3 of 5) | 92.1% (1 of 5) | 97.0% (2 of 5) |
+| No outline | DejaVu Sans, Liberation Sans | 98.9% (4 of 5) | 79.8% (1 of 5) | 96.6% (3 of 5) |
+| Small, 20 to 24 px | DejaVu Sans, Liberation Sans | 98.1% (3 of 4) | 50.0% (0 of 4) | 92.3% (1 of 4) |
+| Capital I and lower case l | DejaVu Sans, Liberation Sans, Noto Sans, Open Sans | 99.4% (15 of 17) | 90.2% (3 of 17) | 97.9% (10 of 17) |
+| Unseen font | Open Sans | 96.7% (5 of 8) | 84.9% (0 of 8) | 96.7% (4 of 8) |
+| All | | 98.3% (51 of 66) | 85.0% (11 of 66) | 97.4% (42 of 66) |
 
 - Character accuracy is 1 minus the edit distance divided by the length of the expected text.
-- The Latin database has no glyphs of these fonts. The numbers show how it does on fonts it has not seen.
-- "After training" adds one trained glyph per character for each font, size and style: the alphabet, digits and `.,!?'-:`, drawn on a separate image. A new recognizer reads each image.
-- With `lineContext: false`, the Latin database reads 80.3% of the characters. Then 37 of the 269 capital I and lower case l in the golden texts come out as the other letter. With `lineContext: true`, none do.
+- The Latin database has no glyphs of these fonts. The numbers show how it does on fonts it has not seen. The subtitle fonts database has no glyphs of Open Sans.
+- "After training" adds to the Latin database one trained glyph per character for each font, size and style: the alphabet, digits and `.,!?'-:`, drawn on a separate image. A new recognizer reads each image.
+- With `lineContext: false`, the Latin database reads 80.3% of the characters. Then 37 of the 269 capital I and lower case l in the golden texts come out as the other letter. The subtitle fonts database reads 91.2%, and 63 come out as the other letter. With `lineContext: true`, none do.
 - With `italicSlant: 0.2`, the italic set reads 96.0% of the characters.
 - With the same database and `lineContext: false`, the port reads every golden image exactly as Subtitle Edit does. `SubtitleEditParityTest` checks this.
 
@@ -90,11 +103,12 @@ Mean time per golden image, one image of 1 or 2 lines, after the database is loa
 
 | | PHP 8.2 | PHP 8.5 |
 |:--- | ---:| ---:|
-| Latin database | 280 ms | 272 ms |
-| After training | 92 ms | 76 ms |
-| Load the Latin database | 119 ms | 54 ms |
+| `subtitleFonts()` | 122 ms | 115 ms |
+| `latin()` | 244 ms | 247 ms |
+| Load `subtitleFonts()` | 184 ms | 90 ms |
+| Load `latin()` | 122 ms | 58 ms |
 
-A full 1920x1080 frame with the same 2 lines takes about 1 second and 103 MB, so crop the image to the text where you can. A glyph that matches nothing is the slow case, because it runs through every match pass. Measured on one core of an x86_64 machine, without JIT.
+A full 1920x1080 frame with the same 2 lines takes about 1 second and 103 MB, so crop the image to the text where you can. A glyph that matches nothing is the slow case, because it runs through every match pass. So the subtitle fonts database is faster on the fonts it knows. Measured on one core of an x86_64 machine, without JIT.
 
 ## Limits
 - One text colour on a transparent or dark background. The ink threshold removes the outline, so text with a light outline or a light background does not work.
@@ -120,3 +134,11 @@ This package is a port of the nOCR engine from [Subtitle Edit](https://github.co
 | `Trainer.php` | `NOcrChar.cs`, `NOcrLineGenerator.cs` |
 | `GlyphSample.php` (merge) | `ExpandedOcrGroup.cs` |
 | `resources/Latin.nocr` | `Ocr/Latin.nocr` at the repository root, unchanged |
+
+`resources/SubtitleFonts.nocr` is trained on renderings of these fonts:
+
+| Font | License |
+|:--- |:--- |
+| [DejaVu Sans 2.37](https://github.com/dejavu-fonts/dejavu-fonts/releases/tag/version_2_37) | Bitstream Vera license with public domain changes |
+| [Liberation Sans 2.1.5](https://github.com/liberationfonts/liberation-fonts/releases/tag/2.1.5) | SIL Open Font License 1.1 |
+| [Noto Sans 2.015](https://github.com/notofonts/latin-greek-cyrillic/releases/tag/NotoSans-v2.015) | SIL Open Font License 1.1 |

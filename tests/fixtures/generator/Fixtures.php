@@ -151,7 +151,7 @@ final class Fixtures
      *     outline: array{int, int, int}, outlineWidth: float, antiAlias: bool, output: string, padding: int,
      *     canvasWidth: int|null}
      */
-    private static function styled(string $style, array $lines, string $font, float $size): array
+    public static function styled(string $style, array $lines, string $font, float $size): array
     {
         return match ($style) {
             'bluray' => self::spec($lines, $font, $size, self::WHITE, $size / 14, true, 'rgba', 6),
