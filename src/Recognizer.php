@@ -184,7 +184,7 @@ final class Recognizer
         $items = Splitter::splitToLetters($bitmap, $spaceWidth, $this->rightToLeft, $lineHeights->minLineHeight(),
                                           $lineHeights->averageLineHeight());
         if ($this->spaceWidth === null) {
-            $items = self::insertSpaces($items);
+            $items = self::insertSpaces($items, $this->rightToLeft);
         }
         $this->lineHeights->update($items);
 
@@ -198,7 +198,7 @@ final class Recognizer
      * @param list<SplitItem> $items
      * @return list<SplitItem>
      */
-    private static function insertSpaces(array $items): array
+    private static function insertSpaces(array $items, bool $rightToLeft): array
     {
         $result = [];
         $line = [];
@@ -211,13 +211,19 @@ final class Recognizer
             sort($heights);
             $typical = count($heights) > 0 ? $heights[intdiv(count($heights) * 3, 4)] : 0;
             $minGap = max(3, (int)round($typical * 0.33));
-            $previousRight = null;
+            // Right to left, each glyph lies left of the glyphs before it, so a gap starts at their left edge.
+            $edge = null;
             foreach ($line as $glyph) {
-                if ($previousRight !== null && $glyph->x - $previousRight >= $minGap) {
-                    $result[] = SplitItem::special(Splitter::SPACE, $glyph->y, $glyph->x - $previousRight);
+                $left = $glyph->x;
+                $right = $glyph->x + $glyph->bitmap->width;
+                if ($edge !== null) {
+                    $gap = $rightToLeft ? $edge - $right : $left - $edge;
+                    if ($gap >= $minGap) {
+                        $result[] = SplitItem::special(Splitter::SPACE, $glyph->y, $gap);
+                    }
                 }
                 $result[] = $glyph;
-                $previousRight = max($previousRight ?? PHP_INT_MIN, $glyph->x + $glyph->bitmap->width);
+                $edge = $rightToLeft ? min($edge ?? PHP_INT_MAX, $left) : max($edge ?? PHP_INT_MIN, $right);
             }
             if ($index < count($items)) {
                 $result[] = $item;
