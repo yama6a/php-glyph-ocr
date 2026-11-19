@@ -133,10 +133,17 @@ class GlyphDatabaseTest extends TestCase
     }
 
 
-    public function testGlyphRejectsASizeTheReaderWouldDrop(): void
+    public function testGlyphRejectsAWidthTheReaderWouldDrop(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new Glyph('W', 1921, 20, 0, false, 0, [], []);
+    }
+
+
+    public function testGlyphRejectsAHeightTheReaderWouldDrop(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new Glyph('W', 20, 1081, 0, false, 0, [], []);
     }
 
 
