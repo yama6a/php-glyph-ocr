@@ -131,4 +131,21 @@ class GlyphDatabaseTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         new Glyph('a', 0, 5, 0, false, 0, [], []);
     }
+
+
+    public function testGlyphRejectsASizeTheReaderWouldDrop(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new Glyph('W', 1921, 20, 0, false, 0, [], []);
+    }
+
+
+    public function testReadsTheLargestGlyph(): void
+    {
+        $glyph = new Glyph('W', 1920, 1080, 0, false, 0, [[0, 0, 1919, 1079]], []);
+
+        $copy = GlyphDatabase::fromBytes((new GlyphDatabase([$glyph]))->toBytes())->glyphs()[0];
+
+        $this->assertEquals($glyph, $copy);
+    }
 }
