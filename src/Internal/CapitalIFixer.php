@@ -149,13 +149,13 @@ final class CapitalIFixer
         $previousLetter = $previous !== null && !$previous->isSpace ? $previous->text : '';
         $nextLetter = $next !== null && !$next->isSpace ? $next->text : '';
 
-        if (preg_match('/^\p{Ll}$/u', $previousLetter) === 1) {
+        if (preg_match('/^\p{Ll}\z/u', $previousLetter) === 1) {
             return 'l';
         }
-        if (preg_match('/^\p{Lu}$/u', $previousLetter) === 1 || preg_match('/^\p{Lu}$/u', $nextLetter) === 1) {
+        if (preg_match('/^\p{Lu}\z/u', $previousLetter) === 1 || preg_match('/^\p{Lu}\z/u', $nextLetter) === 1) {
             return 'I';
         }
-        if (preg_match('/^\p{L}$/u', $previousLetter) !== 1 && preg_match('/^[\p{L}\'\x{2019}]$/u', $nextLetter) !== 1) {
+        if (preg_match('/^\p{L}\z/u', $previousLetter) !== 1 && preg_match('/^[\p{L}\'\x{2019}]\z/u', $nextLetter) !== 1) {
             return 'I';
         }
 

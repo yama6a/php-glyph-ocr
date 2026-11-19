@@ -99,14 +99,18 @@ class RecognizerTest extends TestCase
 
     public function testDerivesSpacesInBothDirections(): void
     {
-        $image = self::bars([2, 22], 5, 30);
+        // The bars are 30 pixels high, so a gap needs 10 empty columns to be a space.
+        $wide = self::bars([2, 22], 5, 30);
+        $narrow = self::bars([2, 16], 5, 30);
 
         foreach ([false, true] as $rightToLeft) {
-            $line = (new Recognizer(new GlyphDatabase(), rightToLeft: $rightToLeft))->split($image)[0];
+            $recognizer = new Recognizer(new GlyphDatabase(), rightToLeft: $rightToLeft);
+            $line = $recognizer->split($wide)[0];
 
             $this->assertCount(3, $line);
             $this->assertNull($line[1]);
             $this->assertSame($rightToLeft ? [22, 2] : [2, 22], [$line[0]->x, $line[2]->x]);
+            $this->assertCount(2, $recognizer->split($narrow)[0]);
         }
     }
 
@@ -192,6 +196,13 @@ class RecognizerTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         new Recognizer(new GlyphDatabase(), spaceWidth: 0);
+    }
+
+
+    public function testRejectsNanAsItalicSlant(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new Recognizer(new GlyphDatabase(), italicSlant: NAN);
     }
 
 

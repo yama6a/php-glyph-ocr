@@ -63,7 +63,7 @@ final class Recognizer
             throw new InvalidArgumentException("Cannot create a recognizer with space width $spaceWidth - " .
                                                "it must be at least 1!");
         }
-        if ($maxWrongPixels < 0 || $italicSlant < 0 || $italicSlant > 1 || $minLineHeight < 1) {
+        if ($maxWrongPixels < 0 || !($italicSlant >= 0 && $italicSlant <= 1) || $minLineHeight < 1) {
             throw new InvalidArgumentException("Cannot create a recognizer - the wrong pixel budget must be at " .
                                                "least 0, the italic slant from 0 to 1 and the minimum line " .
                                                "height at least 1!");
