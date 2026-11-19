@@ -13,6 +13,11 @@ use GlyphOcr\Exceptions\InvalidArgumentException;
  */
 final class Glyph
 {
+    /** The largest width and height that the database reader accepts, in pixels. */
+    public const MAX_WIDTH = 1920;
+    public const MAX_HEIGHT = 1080;
+
+
     /**
      * @param list<array{int, int, int, int}> $foregroundLines each line as [x1, y1, x2, y2]
      * @param list<array{int, int, int, int}> $backgroundLines each line as [x1, y1, x2, y2]
@@ -27,9 +32,10 @@ final class Glyph
         public readonly array $foregroundLines,
         public readonly array $backgroundLines,
     ) {
-        if ($width < 1 || $height < 1 || $width > 0xFFFF || $height > 0xFFFF) {
-            throw new InvalidArgumentException("Cannot create a glyph of {$width}x{$height} pixels - width and " .
-                                               "height must be from 1 to 65535!");
+        if ($width < 1 || $height < 1 || $width > self::MAX_WIDTH || $height > self::MAX_HEIGHT) {
+            throw new InvalidArgumentException("Cannot create a glyph of {$width}x{$height} pixels - the width " .
+                                               "must be from 1 to " . self::MAX_WIDTH . " and the height from " .
+                                               "1 to " . self::MAX_HEIGHT . "!");
         }
         if ($marginTop < 0 || $marginTop > 0xFFFF || $expandCount < 0 || $expandCount > 255) {
             throw new InvalidArgumentException("Cannot create a glyph with margin $marginTop and expand count " .

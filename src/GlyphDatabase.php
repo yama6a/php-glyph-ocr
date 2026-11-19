@@ -300,7 +300,8 @@ final class GlyphDatabase
 
     private static function isValid(int $width, int $height, string $text): bool
     {
-        return $width > 0 && $height > 0 && $width <= 1920 && $height <= 1080 && !str_contains($text, "\0");
+        return $width > 0 && $height > 0 && $width <= Glyph::MAX_WIDTH && $height <= Glyph::MAX_HEIGHT &&
+               !str_contains($text, "\0");
     }
 
 
