@@ -138,6 +138,13 @@ class RecognizerTest extends TestCase
     }
 
 
+    public function testRejectsNanAsItalicSlant(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new Recognizer(new GlyphDatabase(), italicSlant: NAN);
+    }
+
+
     public function testLineContextPicksCapitalIOrLowerCaseL(): void
     {
         $image = self::fixture('capital-i/03');
