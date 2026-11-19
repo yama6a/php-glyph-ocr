@@ -9,13 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 class TrainerTest extends TestCase
 {
-    private static function ring(): GlyphSample
+    private static function ring(int $ink = 1): GlyphSample
     {
         $pixels = [];
         for ($y = 0; $y < 20; $y++) {
             for ($x = 0; $x < 16; $x++) {
                 $distance = sqrt(($x - 7.5) ** 2 + ($y - 9.5) ** 2);
-                $pixels[] = $distance >= 4 && $distance <= 7.5 ? 1 : 0;
+                $pixels[] = $distance >= 4 && $distance <= 7.5 ? $ink : 0;
             }
         }
 
@@ -47,6 +47,12 @@ class TrainerTest extends TestCase
                             (new Trainer(seed: 7))->train(self::ring(), 'o'));
         $this->assertNotEquals((new Trainer(seed: 7))->train(self::ring(), 'o'),
                                (new Trainer(seed: 8))->train(self::ring(), 'o'));
+    }
+
+
+    public function testEveryNonZeroPixelIsInk(): void
+    {
+        $this->assertEquals((new Trainer())->train(self::ring(), 'o'), (new Trainer())->train(self::ring(2), 'o'));
     }
 
 

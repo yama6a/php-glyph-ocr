@@ -155,7 +155,6 @@ final class Trainer
         }
 
         $pixels = $sample->pixels;
-        $wrong = $foreground ? 0 : 1;
         $points = Internal\LinePoints::walk(...$line);
         for ($i = 0, $n = count($points); $i < $n; $i += 2) {
             $x = $points[$i];
@@ -163,27 +162,33 @@ final class Trainer
             if ($x < 0 || $y < 0 || $x >= $width || $y >= $height) {
                 continue;
             }
-            if ($pixels[$y * $width + $x] === $wrong) {
+            if (self::isWrong($pixels[$y * $width + $x], $foreground)) {
                 return false;
             }
             if (!$strict) {
                 continue;
             }
-            if ($width > 10 && $x + 1 < $width && $pixels[$y * $width + $x + 1] === $wrong) {
+            if ($width > 10 && $x + 1 < $width && self::isWrong($pixels[$y * $width + $x + 1], $foreground)) {
                 return false;
             }
-            if ($width > 10 && $x >= 1 && $pixels[$y * $width + $x - 1] === $wrong) {
+            if ($width > 10 && $x >= 1 && self::isWrong($pixels[$y * $width + $x - 1], $foreground)) {
                 return false;
             }
-            if ($height > 10 && $y + 1 < $height && $pixels[($y + 1) * $width + $x] === $wrong) {
+            if ($height > 10 && $y + 1 < $height && self::isWrong($pixels[($y + 1) * $width + $x], $foreground)) {
                 return false;
             }
-            if ($height > 10 && $y >= 1 && $pixels[($y - 1) * $width + $x] === $wrong) {
+            if ($height > 10 && $y >= 1 && self::isWrong($pixels[($y - 1) * $width + $x], $foreground)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+
+    private static function isWrong(int $pixel, bool $foreground): bool
+    {
+        return $foreground ? $pixel === 0 : $pixel !== 0;
     }
 
 

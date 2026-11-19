@@ -7,9 +7,9 @@ use GlyphOcr\Exceptions\InvalidArgumentException;
 /**
  * GlyphSample is a two-colour glyph cut out of an image, ready to train a new database glyph.
  *
- * Pixels are 1 for ink and 0 for background, indexed by y * width + x. The position is in pixels of the
- * image after the empty rows at its top are removed. The top margin is the distance from the top of the
- * text line, which the matcher compares.
+ * Pixels are 1 for ink and 0 for background, indexed by y * width + x. Any other non-zero value is ink too.
+ * The position is in pixels of the image after the empty rows at its top are removed. The top margin is the
+ * distance from the top of the text line, which the matcher compares.
  */
 final class GlyphSample
 {
