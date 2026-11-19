@@ -21,16 +21,19 @@ class RecognizerTest extends TestCase
 
     /**
      * Draws white bars of the given width and height on a transparent image, with their left edges at $xs.
+     * Each bar starts $tops[i] rows lower than the highest bar, 0 when not given.
      *
      * @param list<int> $xs
+     * @param list<int> $tops
      */
-    private static function bars(array $xs, int $barWidth, int $barHeight): Image
+    private static function bars(array $xs, int $barWidth, int $barHeight, array $tops = []): Image
     {
         $width = max($xs) + $barWidth + 2;
-        $height = $barHeight + 4;
+        $height = $barHeight + max([0, ...$tops]) + 4;
         $pixels = array_fill(0, $width * $height, "\0\0\0\0");
-        foreach ($xs as $left) {
-            for ($y = 2; $y < $barHeight + 2; $y++) {
+        foreach ($xs as $index => $left) {
+            $top = 2 + ($tops[$index] ?? 0);
+            for ($y = $top; $y < $top + $barHeight; $y++) {
                 for ($x = $left; $x < $left + $barWidth; $x++) {
                     $pixels[$y * $width + $x] = "\xFF\xFF\xFF\xFF";
                 }
@@ -110,7 +113,7 @@ class RecognizerTest extends TestCase
 
     public function testMatchesAGlyphOfSeveralPartsInBothDirections(): void
     {
-        $image = self::bars([10, 18], 3, 8);
+        $image = self::bars([10, 18], 3, 8, [0, 3]);
         $database = new GlyphDatabase();
         $database->add((new Trainer())->train(GlyphSample::merge(
             (new Recognizer($database, spaceWidth: 100))->split($image)[0],
@@ -119,9 +122,9 @@ class RecognizerTest extends TestCase
         foreach ([false, true] as $rightToLeft) {
             $result = (new Recognizer($database, spaceWidth: 100, rightToLeft: $rightToLeft))->recognize($image);
 
+            $sample = $result->lines[0]->chars[0]->sample;
             $this->assertSame('"', $result->text());
-            $this->assertSame([11, 8], [$result->lines[0]->chars[0]->sample->width,
-                                        $result->lines[0]->chars[0]->sample->height]);
+            $this->assertSame([11, 11, 0], [$sample->width, $sample->height, $sample->marginTop]);
         }
     }
 
