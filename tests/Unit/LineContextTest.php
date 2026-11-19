@@ -77,6 +77,14 @@ class LineContextTest extends TestCase
     }
 
 
+    public function testANeighbourTextWithATrailingNewlineIsNoLetter(): void
+    {
+        $fixer = new CapitalIFixer();
+
+        $this->assertSame("a\nI", self::text($fixer->fixLine(self::line("a\n:10:20", 'I:0:30'))));
+    }
+
+
     public function testPicksTheCaseOfRoundLettersFromTheLine(): void
     {
         // "Do not GO", where the database read o as O and O as o.
