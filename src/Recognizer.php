@@ -68,7 +68,7 @@ final class Recognizer
                                                "least 0, the italic slant from 0 to 1 and the minimum line " .
                                                "height at least 1!");
         }
-        $this->matcher = new Matcher($database, $maxWrongPixels, true, true, $italicSlant);
+        $this->matcher = new Matcher($database, $maxWrongPixels, true, true, $italicSlant, $rightToLeft);
         $this->reset();
     }
 
@@ -114,7 +114,7 @@ final class Recognizer
             [$glyph, $confidence, $slanted] = $match;
             $parts = max(1, $glyph->expandCount);
             $sample = $parts > 1 && $i + $parts <= $count
-                ? GlyphSample::merge(array_map(self::sample(...), array_slice($items, $i, $parts)))
+                ? $this->mergedSample($items, $i, $parts)
                 : self::sample($item);
             $text = $this->fixLatinCase ? $this->caseFixer->fix($glyph->text, $item->bitmap->height) : $glyph->text;
             $chars[] = new RecognizedChar($text, $confidence, $glyph->italic || $slanted, false, $glyph, $sample);
@@ -232,6 +232,17 @@ final class Recognizer
         }
 
         return $result;
+    }
+
+
+    /**
+     * @param list<SplitItem> $items
+     */
+    private function mergedSample(array $items, int $index, int $parts): GlyphSample
+    {
+        $group = array_slice($items, $index, $parts);
+
+        return GlyphSample::merge(array_map(self::sample(...), $this->rightToLeft ? array_reverse($group) : $group));
     }
 
 
