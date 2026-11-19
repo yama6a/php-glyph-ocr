@@ -19,6 +19,28 @@ class RecognizerTest extends TestCase
     }
 
 
+    /**
+     * Draws white bars of the given width and height on a transparent image, with their left edges at $xs.
+     *
+     * @param list<int> $xs
+     */
+    private static function bars(array $xs, int $barWidth, int $barHeight): Image
+    {
+        $width = max($xs) + $barWidth + 2;
+        $height = $barHeight + 4;
+        $pixels = array_fill(0, $width * $height, "\0\0\0\0");
+        foreach ($xs as $left) {
+            for ($y = 2; $y < $barHeight + 2; $y++) {
+                for ($x = $left; $x < $left + $barWidth; $x++) {
+                    $pixels[$y * $width + $x] = "\xFF\xFF\xFF\xFF";
+                }
+            }
+        }
+
+        return Image::fromRgba(implode('', $pixels), $width, $height);
+    }
+
+
     public function testMarksEveryGlyphUnknownWithAnEmptyDatabase(): void
     {
         $result = (new Recognizer(new GlyphDatabase()))->recognize(self::fixture('pgs/05'));
@@ -69,6 +91,24 @@ class RecognizerTest extends TestCase
             fn(?GlyphSample $s): string => $s === null ? ' ' : '#',
             $lines[0],
         )));
+    }
+
+
+    public function testDerivesSpacesInBothDirections(): void
+    {
+        // The bars are 30 pixels high, so a gap needs 10 empty columns to be a space.
+        $wide = self::bars([2, 22], 5, 30);
+        $narrow = self::bars([2, 16], 5, 30);
+
+        foreach ([false, true] as $rightToLeft) {
+            $recognizer = new Recognizer(new GlyphDatabase(), rightToLeft: $rightToLeft);
+            $line = $recognizer->split($wide)[0];
+
+            $this->assertCount(3, $line);
+            $this->assertNull($line[1]);
+            $this->assertSame($rightToLeft ? [22, 2] : [2, 22], [$line[0]->x, $line[2]->x]);
+            $this->assertCount(2, $recognizer->split($narrow)[0]);
+        }
     }
 
 
