@@ -119,6 +119,9 @@ A full 1920x1080 frame with the same 2 lines takes about 1 second and 103 MB, so
 ## Exceptions
 Every exception implements `GlyphOcr\Exceptions\GlyphOcrException`: `InvalidArgumentException`, `InvalidImageException` for a PNG that does not decode, and `InvalidDatabaseException` for a `.nocr` file that does not load.
 
+## Versioning
+Releases follow [semantic versioning](https://semver.org). The public API is every class and method that does not carry `@internal`.
+
 ## Attribution
 This package is a port of the nOCR engine from [Subtitle Edit](https://github.com/SubtitleEdit/subtitleedit) by Nikolaj Olsson, MIT license, at commit [`b8da12a`](https://github.com/SubtitleEdit/subtitleedit/tree/b8da12a4262e0294b1c8a67905b3cfe5066c1e00). `LICENSE` keeps both copyright notices.
 
