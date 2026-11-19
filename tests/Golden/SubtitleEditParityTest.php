@@ -43,7 +43,7 @@ class SubtitleEditParityTest extends TestCase
         $bitmap->cropTopEmptyRows();
         $heights = new LineHeightTracker(12);
         $items = Splitter::splitToLetters($bitmap, 12, false, $heights->minLineHeight(), $heights->averageLineHeight());
-        $matcher = new Matcher($database, 25, true, true, 0.0);
+        $matcher = new Matcher($database, 25, true, true, 0.0, false);
         $caseFixer = new CaseFixer();
 
         $text = '';

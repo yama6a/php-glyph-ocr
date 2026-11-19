@@ -108,6 +108,24 @@ class RecognizerTest extends TestCase
     }
 
 
+    public function testMatchesAGlyphOfSeveralPartsInBothDirections(): void
+    {
+        $image = self::bars([10, 18], 3, 8);
+        $database = new GlyphDatabase();
+        $database->add((new Trainer())->train(GlyphSample::merge(
+            (new Recognizer($database, spaceWidth: 100))->split($image)[0],
+        ), '"'));
+
+        foreach ([false, true] as $rightToLeft) {
+            $result = (new Recognizer($database, spaceWidth: 100, rightToLeft: $rightToLeft))->recognize($image);
+
+            $this->assertSame('"', $result->text());
+            $this->assertSame([11, 8], [$result->lines[0]->chars[0]->sample->width,
+                                        $result->lines[0]->chars[0]->sample->height]);
+        }
+    }
+
+
     public function testFixedSpaceWidthUsesTheSplitterRule(): void
     {
         $recognizer = new Recognizer(GlyphDatabase::latin(), spaceWidth: 1000);

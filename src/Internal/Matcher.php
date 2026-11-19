@@ -66,6 +66,7 @@ final class Matcher
         private readonly bool $deepSeek,
         private readonly bool $lastDitch,
         private readonly float $italicFactor,
+        private readonly bool $rightToLeft,
     ) {
         $this->revision = $database->revision();
     }
@@ -96,7 +97,7 @@ final class Matcher
             }
 
             // The expanded scan depends on the neighbouring glyphs, so it never comes from the cache.
-            return $this->matchExpanded($parent, $item, $index, $items) ?? $cached;
+            return $this->matchExpanded($parent, $items, $index) ?? $cached;
         }
 
         $exact = $this->matchExact($bitmap, $item->top);
@@ -106,7 +107,7 @@ final class Matcher
             return [$exact, 1.0, false];
         }
 
-        $expanded = $this->matchExpanded($parent, $item, $index, $items);
+        $expanded = $this->matchExpanded($parent, $items, $index);
         if ($expanded !== null) {
             return $expanded;
         }
@@ -368,13 +369,13 @@ final class Matcher
      * @param list<SplitItem> $items
      * @return array{Glyph, float, bool}|null
      */
-    private function matchExpanded(Bitmap $parent, SplitItem $item, int $index, array $items): ?array
+    private function matchExpanded(Bitmap $parent, array $items, int $index): ?array
     {
-        $width = $item->bitmap->width;
         $expandedGlyphs = $this->database->expandedGlyphs();
         foreach ($expandedGlyphs as $glyph) {
-            if ($glyph->expandCount > 1 && $glyph->width > $width && $item->x + $glyph->width < $parent->width &&
-                $glyph->lineCount() >= self::MIN_LINES &&
+            $item = $this->leftPart($items, $index, $glyph->expandCount);
+            if ($item !== null && $glyph->width > $item->bitmap->width &&
+                $item->x + $glyph->width < $parent->width && $glyph->lineCount() >= self::MIN_LINES &&
                 self::isExpandedMatch($glyph, $item, $parent, $items, $index)) {
                 [$sizeX, $sizeY] = self::totalSize($index, $items, $glyph->expandCount);
                 if (abs($sizeX - $glyph->width) < 3 && abs($sizeY - $glyph->height) < 3) {
@@ -384,8 +385,9 @@ final class Matcher
         }
 
         foreach ($expandedGlyphs as $glyph) {
-            if ($glyph->expandCount > 1 && $glyph->width > $width && $item->x + $glyph->width < $parent->width &&
-                $glyph->lineCount() >= self::MIN_LINES) {
+            $item = $this->leftPart($items, $index, $glyph->expandCount);
+            if ($item !== null && $glyph->width > $item->bitmap->width &&
+                $item->x + $glyph->width < $parent->width && $glyph->lineCount() >= self::MIN_LINES) {
                 [$sizeX, $sizeY] = self::totalSize($index, $items, $glyph->expandCount);
                 if ($sizeX <= 0 || $sizeY <= 0) {
                     continue;
@@ -403,6 +405,23 @@ final class Matcher
         }
 
         return null;
+    }
+
+
+    /**
+     * Returns the leftmost of the parts that an expanded glyph of $count parts would claim, where the glyph
+     * starts. A right-to-left line lists the parts from the right, so there the leftmost part comes last.
+     *
+     * @param list<SplitItem> $items
+     */
+    private function leftPart(array $items, int $index, int $count): ?SplitItem
+    {
+        if ($count < 2) {
+            return null;
+        }
+        $part = $this->rightToLeft ? ($items[$index + $count - 1] ?? null) : $items[$index];
+
+        return $part?->bitmap === null ? null : $part;
     }
 
 
