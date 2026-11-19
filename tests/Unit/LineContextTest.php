@@ -82,6 +82,10 @@ class LineContextTest extends TestCase
         $fixer = new CapitalIFixer();
 
         $this->assertSame("a\nI", self::text($fixer->fixLine(self::line("a\n:10:20", 'I:0:30'))));
+        $this->assertSame("Ia\n", self::text($fixer->fixLine(self::line('l:0:30', "a\n:10:20"))));
+        $this->assertSame("A\nla", self::text($fixer->fixLine(self::line("A\n:5:25", 'l:0:30', 'a:10:20'))));
+        $this->assertSame("あ\nI", self::text($fixer->fixLine(self::line("あ\n:5:25", 'l:0:30'))));
+        $this->assertSame("あlA\n", self::text($fixer->fixLine(self::line('あ:5:25', 'l:0:30', "A\n:5:25"))));
     }
 
 
